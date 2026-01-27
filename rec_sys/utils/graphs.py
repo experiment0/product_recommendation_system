@@ -1,6 +1,7 @@
 # Функции для вывода графиков
 
 from typing import Optional
+from IPython.display import display, Markdown
 import pandas as pd
 import matplotlib.pyplot as plt 
 import seaborn as sns
@@ -65,3 +66,42 @@ def show_countplot(
     ax.set(xlabel=xlabel, ylabel=ylabel)
     ax.grid(True)
     plt.show()
+
+
+def show_distribution_numeric_value(
+    values: pd.Series,
+    title: str,
+    xlabel: str,
+    ylabel: str,
+) -> None:
+    """Выводит график и характеристики распределения числового признака
+
+    Args:
+        values (pd.Series): набор значений признака
+        title (str): Название графика
+        xlabel (str): Подпись по оси OX
+        ylabel (str): Подпись по оси OY
+    """
+    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(10, 6))
+    plt.subplots_adjust(hspace=.0)
+
+    values.plot(
+        kind="hist",
+        title=title,    
+        ylabel=ylabel,
+        bins=200,
+        grid=True,
+        ax=axes[0],
+    )
+    values.plot(
+        kind="box",
+        grid=True,
+        vert=False,
+        ax=axes[1],
+        xlabel=xlabel,
+    )
+    plt.tight_layout()
+    plt.show()
+    
+    display(Markdown("**Характеристики распределения:**"))
+    display(values.describe())
