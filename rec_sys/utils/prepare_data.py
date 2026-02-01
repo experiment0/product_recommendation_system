@@ -1,6 +1,6 @@
 # Функции для обработки данных
 
-from typing import Optional
+from typing import Optional, Literal
 import numpy as np
 import pandas as pd
 
@@ -175,3 +175,21 @@ def get_unique_values_count(value: str) -> int:
     values = value.split()
     
     return len(set(values))
+
+
+def get_event_weight(event: Literal["transaction", "addtocart", "view"]) -> int:
+    """Возвращает "вес" действия пользователя.
+    Для алгоритма рекомендательной системы этот вес будет использоваться как рейтинг
+    взаимодействия пользователя с товаром.
+
+    Args:
+        event (str): тип события
+
+    Returns:
+        int: вес для переданного события
+    """
+    if event == "transaction":
+        return 10
+    if event == "addtocart":
+        return 3
+    return 1

@@ -26,6 +26,9 @@ def display_common_data_info(data: pd.DataFrame) -> None:
     
     display(Markdown("**Пропуски:**"))
     display(data.isna().sum())
+    
+    mask_duplicated = data.duplicated()
+    display(Markdown(f"**Количество дубликатов:** {len(data[mask_duplicated])}"))
 
 
 def display_property_info(data: pd.DataFrame, property: str) -> None:
