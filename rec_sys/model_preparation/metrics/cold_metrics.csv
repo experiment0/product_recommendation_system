@@ -1,0 +1,14 @@
+model,precision@3,precision@3_debiased
+popular_popularity=n_users_period=None,0.0008196953644311963,2.7405801122952694e-05
+popular_popularity=n_users_period=30,0.0008694899426443068,2.283816760246058e-05
+popular_popularity=n_users_period=60,0.000616686699408517,2.74058011229527e-05
+popular_popularity=n_interactions_period=None,0.0012693787092172826,2.7405801122952694e-05
+popular_popularity=n_interactions_period=30,0.0013712660769456464,2.74058011229527e-05
+popular_popularity=n_interactions_period=60,0.0012693787092172826,2.7405801122952694e-05
+popular_popularity=mean_weight_period=None,7.660704340478472e-07,1.1419083801230291e-06
+popular_popularity=mean_weight_period=30,1.5321408680956943e-06,2.2838167602460583e-06
+popular_popularity=mean_weight_period=60,7.660704340478472e-07,1.1419083801230291e-06
+popular_popularity=sum_weight_period=None,0.0012693787092172826,2.7405801122952694e-05
+popular_popularity=sum_weight_period=30,0.0011674913414889193,2.7405801122952694e-05
+popular_popularity=sum_weight_period=60,0.0013727982178137422,2.7405801122952694e-05
+random,6.894633906430625e-06,4.5676335204921166e-06

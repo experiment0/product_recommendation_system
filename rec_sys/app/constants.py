@@ -1,0 +1,2 @@
+ANNOY_VECTOR_SIZE = 314
+ANNOY_METRIC = "angular"
