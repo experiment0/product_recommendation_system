@@ -1,10 +1,9 @@
 from .similar_items_seacher import SimilarItemsSeacher
-from .items_ranker import ItemsRanker
-from .items_recommender import ItemsRecommender
-
+from .similar_items_ranker import SimilarItemsRanker
+from .recommender_similar_items import RecommenderSimilarItems
 
 __all__ = [
     "SimilarItemsSeacher",
-    "ItemsRanker",
-    "ItemsRecommender",
+    "SimilarItemsRanker",
+    "RecommenderSimilarItems",
 ]

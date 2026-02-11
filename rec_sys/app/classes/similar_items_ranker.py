@@ -2,7 +2,7 @@ import pandas as pd
 from rectools import Columns
 
 
-class ItemsRanker:
+class SimilarItemsRanker:
     def __init__(self, items_data: pd.DataFrame) -> None:
         """Класс для ранжирования списка товаров
 

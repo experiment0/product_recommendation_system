@@ -2,14 +2,14 @@ import pandas as pd
 from rectools import Columns
 
 from .similar_items_seacher import SimilarItemsSeacher
-from .items_ranker import ItemsRanker
+from .similar_items_ranker import SimilarItemsRanker
 
 
-class ItemsRecommender:
+class RecommenderSimilarItems:
     def __init__(
         self,
         similar_items_seacher: SimilarItemsSeacher,
-        items_ranker: ItemsRanker,
+        similar_items_ranker: SimilarItemsRanker,
         events_data: pd.DataFrame, 
         similar_items_count: int = 10,
     ) -> None:
@@ -17,7 +17,7 @@ class ItemsRecommender:
 
         Args:
             similar_items_seacher (SimilarItemsSeacher): Объект для поиска похожих товаров
-            items_ranker (ItemsRanker): Объект для ранжирования товаров
+            similar_items_ranker (SimilarItemsRanker): Объект для ранжирования товаров
             events_data (pd.DataFrame): Данные о взаимодействиях пользователей с товарами.
                 Содержит 2 колонки - id пользователя и id товара.
                 Данные отсортированы в порядке взаимодействия.
@@ -25,7 +25,7 @@ class ItemsRecommender:
                 По умолчанию 10.
         """
         self.similar_items_seacher = similar_items_seacher
-        self.items_ranker = items_ranker
+        self.similar_items_ranker = similar_items_ranker
         self.events_data = events_data.copy()
         self.similar_items_count = similar_items_count
     
@@ -63,6 +63,6 @@ class ItemsRecommender:
         similar_items = [item_id for item_id in similar_items if item_id not in user_items]
         
         # Получаем наши 3 ранжированные товара
-        ranked_items = self.items_ranker.get(similar_items)
+        ranked_items = self.similar_items_ranker.get(similar_items)
         
         return ranked_items
