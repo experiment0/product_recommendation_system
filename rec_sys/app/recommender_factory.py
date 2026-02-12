@@ -10,12 +10,13 @@ from rectools import Columns
 from rectools.dataset import Dataset
 from rectools.models import load_model, ImplicitALSWrapperModel
 
-from classes import (
+from .types import ItemsType
+from .classes import (
     SimilarItemsSeacher,
     SimilarItemsRanker,
     RecommenderSimilarItems,
 )
-from constants import (
+from .constants import (
     ANNOY_VECTOR_SIZE, 
     ANNOY_METRIC, 
     SIMILAR_ITEMS_COUNT,
@@ -55,10 +56,6 @@ model_als = load_model(APP_PATH / "models/model_als.pkl")
 
 
 # Далее создадим объекты для формирования рекомендаций каждой из 3-х групп
-
-
-# Тип списка с товарами
-ItemsType = list[int]
 
 
 # Создаем класс и объект для группы "normal" (пользователи с нормальной активностью)
@@ -206,7 +203,7 @@ class RecommenderFactory:
 
 recommender_factory = RecommenderFactory(
     normal_user_ids=set(dense_features_normal_dataset.user_id_map.external_ids),
-    extremal_user_ids=set(items_ranking_data[Columns.Item].unique()),
+    extremal_user_ids=set(events_train_extremal_data[Columns.User].unique()),
     recommenders=recommenders,
 )
 
