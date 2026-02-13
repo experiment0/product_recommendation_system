@@ -1,3 +1,4 @@
+import sys
 from pydantic import BaseModel, Field
 from pathlib import Path
 from fastapi import FastAPI
@@ -5,23 +6,27 @@ import logging
 from logging.handlers import RotatingFileHandler
 import traceback
 
-from .utils.types import ItemIdsType
-from .utils.metrics import (
-    calculate_group_metrics, 
-    GroupMetricsRequest,
-    GroupMetricsResponse,
-)
-from .recommender_factory import recommender_factory
-
-
-# Версия приложения
-VERSION = "0.1.0"
-
-
 # Путь к текущему файлу
 current_file = Path(__file__).resolve()
 # Путь к папке с приложением
 APP_PATH = current_file.parent.resolve()
+
+# Добавляем родительскую папку app в PATH,
+# чтобы в пределах данного репо можно было импортировать из модуля app
+sys.path.append(str(APP_PATH.parent))
+
+from app.utils.types import ItemIdsType
+from app.utils.metrics import (
+    calculate_group_metrics, 
+    GroupMetricsRequest,
+    GroupMetricsResponse,
+)
+from app.recommender_factory import recommender_factory
+
+
+# Версия и название приложения
+APP_VERSION = "0.1.0"
+APP_TITLE = "Product recommendation system API"
 
 
 # Настраиваем логирование
@@ -48,31 +53,41 @@ def set_logger_settings():
     )
     logger.addHandler(log_handler)
     
-    logging.basicConfig(level=logging.INFO)   
+    logging.basicConfig(level=logging.INFO)
 
 
 # Создаем приложение
 app = FastAPI(
-    title="Product recommendation system API",
+    title=APP_TITLE,
     description="API рекомендательной системы товаров",
-    version=VERSION,
+    version=APP_VERSION,
     on_startup=[set_logger_settings],
     on_shutdown=[logging.shutdown]
 )
 
 
 # Эндпойнты
-@app.get("/", description="Информация о приложении")
-def index() -> dict:
-    return {
-        "service": "Product recommendation system",
-        "version": VERSION,
-        "endpoints": {
-            "docs": "/docs",
-            "redoc": "/redoc",
-            "recommend": "/recommend/{user_id}"
-        }
-    }
+
+documentation_endpoints = { "docs": "/docs", "redoc": "/redoc" }
+
+class AppInfo(BaseModel):
+    service: str = Field(
+        description="Название приложения", examples=[APP_TITLE]
+    )
+    version: str = Field(
+        description="Версия приложения", examples=[APP_VERSION]
+    )
+    documentation_endpoints: dict[str,str] = Field(
+        description="Ссылки на документацию", examples=[documentation_endpoints]
+    )
+    
+@app.get("/", response_model=AppInfo, description="Информация о приложении")
+def index() -> AppInfo:
+    return AppInfo(
+        service=APP_TITLE,
+        version=APP_VERSION,
+        documentation_endpoints=documentation_endpoints,
+    )
 
 
 class RecommendationsResponse(BaseModel):
@@ -99,7 +114,7 @@ def get_recommendations(user_id: int) -> RecommendationsResponse:
         error_message = ". ".join([
             f"Fail on get recommendations for user_id={user_id}",
             str(error),
-            traceback.format_exc()
+            traceback.format_exc(),
         ])
         logger.error(error_message)
         
@@ -112,4 +127,14 @@ def get_recommendations(user_id: int) -> RecommendationsResponse:
     description="Подсчитывает метрики по переданным интеракциям для каждой группы пользователей",
 )
 def calculate_metrics(request: GroupMetricsRequest) -> GroupMetricsResponse:
-    return calculate_group_metrics(request)
+    try:
+        return calculate_group_metrics(request)
+    except Exception as error:
+        error_message = ". ".join([
+            "An error occurred while calculating metrics",
+            str(error),
+            traceback.format_exc(),
+        ])
+        logger.error(error_message)
+        
+        raise

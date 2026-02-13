@@ -1,9 +1,9 @@
 import pandas as pd
 from rectools import Columns
 
-from ..utils.types import ItemIdsType
-from .similar_items_seacher import SimilarItemsSeacher
-from .similar_items_ranker import SimilarItemsRanker
+from app.utils.types import ItemIdsType
+from app.classes.similar_items_seacher import SimilarItemsSeacher
+from app.classes.similar_items_ranker import SimilarItemsRanker
 
 
 class RecommenderSimilarItems:

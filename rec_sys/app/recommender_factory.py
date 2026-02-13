@@ -1,3 +1,4 @@
+import logging
 from typing import Optional, Union, Callable, Tuple
 import json
 from pathlib import Path
@@ -10,18 +11,23 @@ from rectools import Columns
 from rectools.dataset import Dataset
 from rectools.models import load_model, ImplicitALSWrapperModel
 
-from .utils.types import ItemIdsType, UserGroupType
-from .classes import (
+from app.classes import (
     SimilarItemsSeacher,
     SimilarItemsRanker,
     RecommenderSimilarItems,
 )
-from .utils.constants import (
+from app.utils.types import ItemIdsType, UserGroupType
+from app.utils.constants import (
     ANNOY_VECTOR_SIZE, 
     ANNOY_METRIC, 
     SIMILAR_ITEMS_COUNT,
     RECOMMENDATIONS_COUNT,
 )
+
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
 
 # Путь к текущему файлу
 current_file = Path(__file__).resolve()
@@ -45,14 +51,38 @@ with open(APP_PATH / "data/popular_items.pkl", "rb") as file:
 items_ranking_data = pd.read_csv(APP_PATH / "data/items_ranking_data.csv")
 events_train_extremal_data = pd.read_csv(APP_PATH / "data/events_train_extremal_data.csv")
 
-annoy_index = AnnoyIndex(ANNOY_VECTOR_SIZE, metric=ANNOY_METRIC)
-# annoy_index_path = APP_PATH / "models/annoy_items_index.ann"
-# annoy_index_path_str = str(annoy_index_path)
-# TODO - на windows annoy видит путь от корня папки и не видит абсолютных путей
-# Это проявляется в python файлах
-annoy_index.load("./rec_sys/app/models/annoy_items_index.ann")
-
 model_als = load_model(APP_PATH / "models/model_als.pkl")
+
+annoy_index = AnnoyIndex(ANNOY_VECTOR_SIZE, metric=ANNOY_METRIC)
+annoy_index_path = APP_PATH / "models/annoy_items_index.ann"
+annoy_index_path_str = str(annoy_index_path)
+try:
+    # Так индекс Annoy должен загружаться на linux
+    annoy_index.load(annoy_index_path_str)
+except OSError as error:
+    # На windows annoy видит путь от корня папки и не видит абсолютных путей
+    # Это проявляется в python файлах
+    logger.error(
+        " ".join([
+            "An error occurred while trying to load the Annoy index from path:",
+            annoy_index_path_str,
+            "Error:",
+            str(error),
+        ])
+    )
+    annoy_index_relative_path = "./rec_sys/app/models/annoy_items_index.ann"
+    annoy_index.load(annoy_index_relative_path)
+    logger.info(
+        " ".join([
+            "Annoy index successfully loaded from path:",
+            annoy_index_relative_path
+        ])
+    )
+except Exception as error:
+    logger.error(
+        f"An error occurred while trying to load the Annoy index. {error}"
+    )
+    raise
 
 
 # Далее создадим объекты для формирования рекомендаций каждой из 3-х групп

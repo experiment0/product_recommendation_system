@@ -43,7 +43,7 @@ def main():
     formatted_batch = batch_data.to_dict("list")
     
     # Урл для подсчета метрик
-    metrics_url = "http://127.0.0.1:8000/metrics"
+    metrics_url = "http://localhost:8000/metrics"
 
     # Делаем запрос
     response = requests.post(metrics_url, json=formatted_batch)

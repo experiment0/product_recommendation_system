@@ -3,14 +3,14 @@ import pandas as pd
 from pydantic import BaseModel, Field, model_validator
 from rectools.metrics import Precision
 
-from .constants import RECOMMENDATIONS_COUNT
-from .types import (
+from app.utils.constants import RECOMMENDATIONS_COUNT
+from app.utils.types import (
     UserIdsType, 
     ItemIdsType, 
     UserGroupType, 
     MetricNameType,
 )
-from ..recommender_factory import recommender_factory
+from app.recommender_factory import recommender_factory
 
 
 class FormattedRecommendations(BaseModel):
@@ -90,12 +90,17 @@ class Metric(BaseModel):
     )    
     
 class GroupMetrics(BaseModel):
-    group_name: UserGroupType
+    group_name: UserGroupType = Field(
+        description="Название группы",
+        examples=["normal"],
+    )
     unique_user_ids_count: int = Field(
         description="Количество уникальных пользователей",
         examples=[100],
     )
-    metrics: list[Metric]
+    metrics: list[Metric] = Field(
+        description="Набор данных о каждой метрике"
+    )
 
 GroupMetricsRequest = Interactions
 GroupMetricsResponse = list[GroupMetrics]
