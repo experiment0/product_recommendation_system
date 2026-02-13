@@ -82,18 +82,18 @@ class Interactions(BaseModel):
 class Metric(BaseModel):
     name: MetricNameType = Field(
         description="Название метрики",
-        examples=[["precision@3"]],
+        examples=["precision@3"],
     )
     value: float = Field(
         description="Значение метрики",
-        examples=[[0.005]],
+        examples=[0.005],
     )    
     
 class GroupMetrics(BaseModel):
     group_name: UserGroupType
     unique_user_ids_count: int = Field(
         description="Количество уникальных пользователей",
-        examples=[[100]],
+        examples=[100],
     )
     metrics: list[Metric]
 
@@ -130,7 +130,7 @@ def calculate_group_metrics(
     recommendations_data = pd.DataFrame(recommendations.model_dump())
     
     # Итоговый ответ, который сформируем
-    response = []
+    metrics_response = []
     # Имя нашей единственной метрики
     precision_3_name: MetricNameType = "precision@3"
     # Имена групп пользователей вынем из типа данных
@@ -162,6 +162,6 @@ def calculate_group_metrics(
         )        
         group_metrics.metrics.append(metric)
         
-        response.append(group_metrics)
+        metrics_response.append(group_metrics)
     
-    return response
+    return metrics_response

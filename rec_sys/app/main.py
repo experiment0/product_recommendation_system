@@ -108,7 +108,7 @@ def get_recommendations(user_id: int) -> RecommendationsResponse:
 
 @app.post(
     "/metrics", 
-    response_model=GroupMetricsRequest,
+    response_model=GroupMetricsResponse,
     description="Подсчитывает метрики по переданным интеракциям для каждой группы пользователей",
 )
 def calculate_metrics(request: GroupMetricsRequest) -> GroupMetricsResponse:
