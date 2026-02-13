@@ -1,4 +1,4 @@
-from typing import Literal, Optional, Union, Callable
+from typing import Optional, Union, Callable, Tuple
 import json
 from pathlib import Path
 import numpy as np
@@ -10,13 +10,13 @@ from rectools import Columns
 from rectools.dataset import Dataset
 from rectools.models import load_model, ImplicitALSWrapperModel
 
-from .types import ItemsType
+from .utils.types import ItemIdsType, UserGroupType
 from .classes import (
     SimilarItemsSeacher,
     SimilarItemsRanker,
     RecommenderSimilarItems,
 )
-from .constants import (
+from .utils.constants import (
     ANNOY_VECTOR_SIZE, 
     ANNOY_METRIC, 
     SIMILAR_ITEMS_COUNT,
@@ -79,7 +79,7 @@ class RecommenderAlsItems:
         self.dense_features_normal_dataset = dense_features_normal_dataset
         self.recommendations_count = recommendations_count
     
-    def get(self, user_id: int) -> ItemsType:
+    def get(self, user_id: int) -> ItemIdsType:
         """Обращается к модели ALS за получением рекомендованых товаров
         И далее из датафрейма вынимает id товаров и преобразует в список.
 
@@ -87,7 +87,7 @@ class RecommenderAlsItems:
             user_id (int): id пользователя
 
         Returns:
-            ItemsType: рекомендуемые товары
+            ItemIdsType: рекомендуемые товары
         """
         recomendations_data = self.model_als.recommend(
             users=[user_id],
@@ -127,14 +127,13 @@ class RecommenderPopularItems:
     def __init__(self, popular_items: np.ndarray) -> None:
         self.popular_items = list(popular_items)
         
-    def get(self, user_id: Optional[int] = None) -> ItemsType:
+    def get(self, user_id: Optional[int] = None) -> ItemIdsType:
         return self.popular_items
 
 recommender_cold_group = RecommenderPopularItems(popular_items)
 
 
 # Типы данных и маппер объектов для рекомендаций
-UserGroupType = Literal["normal", "extremal", "cold"]
 RecommenderForGroupType = Union[
     RecommenderAlsItems,
     RecommenderSimilarItems,
@@ -185,7 +184,7 @@ class RecommenderFactory:
             return "extremal"        
         return "cold"
         
-    def get_recommender_items(self, user_id: int) -> Callable:
+    def get_recommender_items(self, user_id: int) -> Tuple[UserGroupType, Callable] :
         """Определяет функцию, которая будет возвращать рекомендации для переданного пользователя
 
         Args:
@@ -196,10 +195,10 @@ class RecommenderFactory:
         """
         user_group = self.get_user_group(user_id)
         
-        def get_items() -> ItemsType:
+        def get_items() -> ItemIdsType:
             return self.recommenders[user_group].get(user_id)
         
-        return get_items
+        return user_group, get_items
 
 recommender_factory = RecommenderFactory(
     normal_user_ids=set(dense_features_normal_dataset.user_id_map.external_ids),
@@ -208,6 +207,6 @@ recommender_factory = RecommenderFactory(
 )
 
 # Как использовать:
-# recommend_items = recommender_factory.get_recommender_items(1222911)
+# user_group, recommend_items = recommender_factory.get_recommender_items(1222911)
 # print(recommend_items())
 # -> [26477, 20017, 103127]

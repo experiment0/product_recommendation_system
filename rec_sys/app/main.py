@@ -5,11 +5,18 @@ import logging
 from logging.handlers import RotatingFileHandler
 import traceback
 
-from .types import ItemsType
+from .utils.types import ItemIdsType
+from .utils.metrics import (
+    calculate_group_metrics, 
+    GroupMetricsRequest,
+    GroupMetricsResponse,
+)
 from .recommender_factory import recommender_factory
 
 
+# Версия приложения
 VERSION = "0.1.0"
+
 
 # Путь к текущему файлу
 current_file = Path(__file__).resolve()
@@ -17,6 +24,7 @@ current_file = Path(__file__).resolve()
 APP_PATH = current_file.parent.resolve()
 
 
+# Настраиваем логирование
 logger = logging.getLogger(__name__)
 
 def set_logger_settings():
@@ -53,13 +61,7 @@ app = FastAPI(
 )
 
 
-class RecommendationsResponse(BaseModel):
-    item_ids: ItemsType = Field(
-        description="id рекомендуемых товаров", 
-        examples=[[26477, 20017, 103127]],
-    )
-
-
+# Эндпойнты
 @app.get("/", description="Информация о приложении")
 def index() -> dict:
     return {
@@ -73,6 +75,12 @@ def index() -> dict:
     }
 
 
+class RecommendationsResponse(BaseModel):
+    item_ids: ItemIdsType = Field(
+        description="id рекомендуемых товаров", 
+        examples=[[26477, 20017, 103127]],
+    )
+
 @app.get(
     "/recommend/{user_id}", 
     response_model=RecommendationsResponse, 
@@ -80,7 +88,9 @@ def index() -> dict:
 )
 def get_recommendations(user_id: int) -> RecommendationsResponse:
     try:
-        recommend_items = recommender_factory.get_recommender_items(user_id)
+        # Первым значением мы получаем группу пользователя
+        # Пока видится, что ее незачем возвращать в публичное апи
+        _, recommend_items = recommender_factory.get_recommender_items(user_id)
         item_ids = recommend_items()
         
         return RecommendationsResponse(item_ids=item_ids)
@@ -92,4 +102,14 @@ def get_recommendations(user_id: int) -> RecommendationsResponse:
             traceback.format_exc()
         ])
         logger.error(error_message)
+        
         raise
+
+
+@app.post(
+    "/metrics", 
+    response_model=GroupMetricsRequest,
+    description="Подсчитывает метрики по переданным интеракциям для каждой группы пользователей",
+)
+def calculate_metrics(request: GroupMetricsRequest) -> GroupMetricsResponse:
+    return calculate_group_metrics(request)

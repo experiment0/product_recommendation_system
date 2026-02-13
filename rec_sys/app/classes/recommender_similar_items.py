@@ -1,7 +1,7 @@
 import pandas as pd
 from rectools import Columns
 
-from ..types import ItemsType
+from ..utils.types import ItemIdsType
 from .similar_items_seacher import SimilarItemsSeacher
 from .similar_items_ranker import SimilarItemsRanker
 
@@ -31,14 +31,14 @@ class RecommenderSimilarItems:
         self.similar_items_count = similar_items_count
     
     
-    def get(self, user_id: int) -> ItemsType:
+    def get(self, user_id: int) -> ItemIdsType:
         """Подбирает рекомендованные товары для переданного пользователя
 
         Args:
             user_id (int): id пользователя
 
         Returns:
-            ItemsType: рекомендуемые товары
+            ItemIdsType: рекомендуемые товары
         """
         # Отделим товары, с которыми взаимодействовал данный пользователь
         mask_user = self.events_data[Columns.User] == user_id
