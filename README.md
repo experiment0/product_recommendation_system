@@ -28,6 +28,8 @@
 
 Подробное описание таблиц и построения системы находится в файле [./rec_sys/model_preparation/01_main.ipynb](./rec_sys/model_preparation/01_main.ipynb)
 
+Презентация по проекту доступна [по ссылке](https://docs.google.com/presentation/d/1mM1vZaO9yGj2hZkFmuuZlXCaQaKFZmYzxefJcId9LlM/edit?usp=sharing).
+
 ## Описание структуры проекта
 
 - [rec_sys](./rec_sys/) - каталог содержит основной код для построения и запуска рекомендательной системы.
