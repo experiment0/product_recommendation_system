@@ -1,4 +1,17 @@
+from typing import Union
 import time
+
+
+def get_formatted_number(number: Union[int,float]) -> str:
+    """Добавляет при выводе числа разбиение на десятичные разряды
+
+    Args:
+        number (Union[int,float]): исходное число
+
+    Returns:
+        str: запись числа с разбиением на разряды
+    """
+    return '{0:,}'.format(number).replace(',', ' ')
 
 
 def get_exec_time(start: float, end: float) -> str:

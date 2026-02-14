@@ -6,6 +6,8 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 import seaborn as sns
 
+from rec_sys.utils.helpers import get_formatted_number
+
 
 def show_pie(data: pd.DataFrame, feature_name: str, title: str) -> None:
     """Выводит круговую диаграмму
@@ -28,6 +30,28 @@ def show_pie(data: pd.DataFrame, feature_name: str, title: str) -> None:
     );
 
 
+def show_pie_by_dict(data: dict[str, float], title: str):
+    """Выводит круговую диаграмму для данных, переданных в формате словаря
+
+    Args:
+        data (dict[str, float]): словарь в формате {имя}->{количество}
+        title (str): название графика
+    """
+    fig = plt.figure(figsize=(4, 4))
+    axes = fig.add_axes([0, 0, 1, 1])
+    
+    names = [
+        f"{key} ({get_formatted_number(value)})" for key, value in data.items()
+    ]
+
+    axes.set_title(title)
+    axes.pie(
+        data.values(),
+        labels=names,
+        autopct="%.2f%%",
+    );
+    
+    
 def show_countplot(
     data: pd.DataFrame,
     feature_name: str,
